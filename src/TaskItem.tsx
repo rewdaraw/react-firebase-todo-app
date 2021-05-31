@@ -1,6 +1,7 @@
-import React from "react";
-import "firebase";
-import { ListItem } from "@material-ui/core";
+import React, { useState } from "react";
+import { db } from "./firebase";
+import { Grid, ListItem, TextField } from "@material-ui/core";
+import { DeleteOutlined, EditOutlined } from "@material-ui/icons";
 
 interface Props {
   id: string;
@@ -8,12 +9,35 @@ interface Props {
 }
 
 export const TaskItem: React.VFC<Props> = (props) => {
-  const { id, title } = props;
+  const [title, setTitle] = useState(props.title);
+
+  const editTask = () => {
+    db.collection("tasks").doc(props.id).set({ title: title }, { merge: true });
+  };
+
+  const deleteTask = () => {
+    db.collection("tasks").doc(props.id).delete();
+  };
+
   return (
-    <div>
-      <ListItem>
-        <h2>{title}</h2>
-      </ListItem>
-    </div>
+    <ListItem>
+      <h2>{props.title}</h2>
+      <Grid container justify="flex-end">
+        <TextField
+          InputLabelProps={{ shrink: true }}
+          label="Edit task"
+          value={title}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setTitle(e.target.value)
+          }
+        />
+      </Grid>
+      <button onClick={editTask}>
+        <EditOutlined />
+      </button>
+      <button onClick={deleteTask}>
+        <DeleteOutlined />
+      </button>
+    </ListItem>
   );
 };
