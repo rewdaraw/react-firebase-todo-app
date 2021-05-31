@@ -13,7 +13,7 @@ const useStyles = makeStyles({
   },
   list: {
     margin: "auto",
-    width: "40%",
+    width: "60%",
   },
 });
 
