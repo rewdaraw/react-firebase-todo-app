@@ -9,12 +9,12 @@ export const Login: React.FC = (props: any) => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    const unSub = auth.onAuthStateChanged((user) => {
       user && props.history.push("/");
     });
-    // return () => {
-    //   cleanup
-    // }
+    return () => {
+      unSub();
+    };
   }, [props.history]);
   return (
     <div className={styles.login__root}>

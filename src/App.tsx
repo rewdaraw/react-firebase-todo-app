@@ -1,10 +1,11 @@
-import { FormControl, List, TextField } from "@material-ui/core";
-import { AddToPhotos } from "@material-ui/icons";
+import { Button, FormControl, List, TextField } from "@material-ui/core";
+import { AddToPhotos, ExitToApp } from "@material-ui/icons";
 import React, { useState, useEffect } from "react";
 import { db } from "./firebase";
 import { TaskItem } from "./TaskItem";
 import styles from "./App.module.css";
 import { makeStyles } from "@material-ui/styles";
+import { auth } from "./firebase";
 
 const useStyles = makeStyles({
   field: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles({
   },
 });
 
-const App: React.FC = () => {
+const App: React.FC = (props: any) => {
   const [tasks, setTasks] = useState([{ id: "", title: "" }]);
   const [input, setInput] = useState("");
 
@@ -35,6 +36,15 @@ const App: React.FC = () => {
     return () => unSub();
   }, []);
 
+  useEffect(() => {
+    const unSub = auth.onAuthStateChanged((user) => {
+      !user && props.history.push("/login");
+    });
+    return () => {
+      unSub();
+    };
+  }, [props.history]);
+
   const newTask = () => {
     db.collection("tasks").add({ title: input });
     // db登録後、新規の入力に備えて初期化する
@@ -44,6 +54,19 @@ const App: React.FC = () => {
   return (
     <div className={styles.app__root}>
       <h1>Todo App by React</h1>
+      <Button
+        className={styles.app_logout}
+        onClick={async () => {
+          try {
+            await auth.signOut();
+            props.history.push("/login");
+          } catch (error) {
+            alert(error.message);
+          }
+        }}
+      >
+        <ExitToApp />
+      </Button>
       <br />
       <FormControl>
         <TextField
